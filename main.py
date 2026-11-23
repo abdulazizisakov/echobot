@@ -1,36 +1,32 @@
-from telegram.ext import Updater, CommandHandler, CallbackContext
-from telegram import Update
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+    MessageHandler,
+    Filters,
+)
 
 from settings import TOKEN
-
-
-def start(update: Update, context: CallbackContext) -> None:
-    bot = context.bot
-
-    bot.send_message(
-        chat_id=update.message.chat.id,
-        text="Salom xush kelibsiz.",
-    )
-
-
-def help(update: Update, context: CallbackContext) -> None:
-    bot = context.bot
-
-    bot.send_message(
-        chat_id=update.message.chat.id,
-        text="Qanday yordam berolaman.",
-    )
+from callbacks import start, help, send_menu
 
 
 def main() -> None:
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
 
+    # command handlers
     dispatcher.add_handler(
         handler=CommandHandler(command=["start", "boshlash"], callback=start)
     )
     dispatcher.add_handler(
         handler=CommandHandler(command=["help", "yordam"], callback=help)
+    )
+
+    # message handlers
+    dispatcher.add_handler(
+        handler=MessageHandler(
+            filters=Filters.text("Menu"),
+            callback=send_menu,
+        )
     )
 
     updater.start_polling()
